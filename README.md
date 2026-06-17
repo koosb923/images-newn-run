@@ -83,3 +83,7 @@ docker run --rm -p 8507:8507 \
 ```bash
 ./deploy.sh
 ```
+
+## 자동 배포
+
+`main` 브랜치에 push되면 GitHub webhook이 `https://deploy.newn.run/webhook`으로 전달되고, 중앙 배포 웹훅 서버가 `./deploy.sh`를 실행해 `images-app` 컨테이너를 재빌드/재시작합니다.
