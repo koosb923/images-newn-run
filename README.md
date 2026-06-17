@@ -1,6 +1,8 @@
 # images-newn-run
 
-`images.newn.run` 도메인에서 사용할 FastAPI 기반 이미지 업로드/정적 서빙 서버입니다.
+`images.newn.run` 도메인에서 사용할 FastAPI 기반 정적 이미지 오리진 서버입니다.
+
+이미지 업로드/목록/삭제 API는 `api-newn-run`의 `/v1/images`에서 처리하고, 이 서버는 공유 저장소에 저장된 파일을 `/images/...` 경로로 서빙만 합니다.
 
 ## 실행 정보
 
@@ -16,8 +18,6 @@
 | --- | --- | --- |
 | `PUBLIC_BASE_URL` | `https://images.newn.run` | 업로드 응답에 포함할 공개 URL |
 | `IMAGE_STORAGE_DIR` | `/app/data/images` | 이미지 저장 경로 |
-| `MAX_UPLOAD_SIZE_MB` | `20` | 업로드 최대 크기 |
-| `IMAGE_SERVER_API_KEY` | 빈 값 | 설정하면 `X-API-Key` 헤더가 있어야 업로드/삭제 가능 |
 | `CORS_ALLOW_ORIGINS` | `*` | 쉼표 구분 CORS 허용 origin |
 
 ## API
@@ -28,35 +28,10 @@
 curl http://localhost:8507/health
 ```
 
-### 이미지 업로드
+### 이미지 파일 조회
 
 ```bash
-curl -X POST http://localhost:8507/v1/images \
-  -H "X-API-Key: $IMAGE_SERVER_API_KEY" \
-  -F "file=@sample.png" \
-  -F "folder=articles" \
-  -F "alt=sample image"
-```
-
-응답의 `image.url`은 `https://images.newn.run/images/...` 형태입니다.
-
-### 목록 조회
-
-```bash
-curl "http://localhost:8507/v1/images?limit=50"
-```
-
-### 메타데이터 조회
-
-```bash
-curl http://localhost:8507/v1/images/{image_id}
-```
-
-### 삭제
-
-```bash
-curl -X DELETE http://localhost:8507/v1/images/{image_id} \
-  -H "X-API-Key: $IMAGE_SERVER_API_KEY"
+curl -I https://images.newn.run/images/articles/sample.png
 ```
 
 ## 로컬 실행
@@ -83,6 +58,19 @@ docker run --rm -p 8507:8507 \
 ```bash
 ./deploy.sh
 ```
+
+## 업로드 API
+
+외부 클라이언트는 이미지 업로드/목록/삭제를 `api-newn-run`으로 요청합니다.
+
+```bash
+curl -X POST "https://api.newn.run/v1/images/upload?api_key=$API_KEY" \
+  -F "file=@sample.png" \
+  -F "folder=articles" \
+  -F "alt=sample image"
+```
+
+응답의 `image.url`은 `https://images.newn.run/images/...` 형태입니다.
 
 ## 자동 배포
 
