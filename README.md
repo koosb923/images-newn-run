@@ -1,8 +1,8 @@
 # cdn-newn-run
 
-`cdn.newn.run` 도메인에서 사용할 FastAPI 기반 보호 이미지 저장소 서버입니다.
+`cdn.newn.run` 도메인에서 사용할 FastAPI 기반 이미지 CDN 서버입니다.
 
-이미지 업로드/목록/삭제/다운로드 API는 `api-newn-run`의 `/v1/images`에서 처리합니다. 이 서버는 공유 저장소 상태만 확인하고, `/images/...` 직접 파일 접근은 `403`으로 차단합니다.
+이미지 업로드/목록/삭제/다운로드 API는 `api-newn-run`의 `/v1/images`에서 처리합니다. 이 서버는 공유 저장소의 `public` 파일만 정적 URL로 제공하고, `private` 파일 직접 접근은 `403`으로 차단합니다.
 
 ## 실행 정보
 
@@ -27,10 +27,16 @@
 curl http://localhost:8507/health
 ```
 
-### 이미지 직접 조회 차단 확인
+### public 이미지 조회
 
 ```bash
-curl -i https://cdn.newn.run/images/articles/sample.png
+curl -i https://cdn.newn.run/public/articles/sample.png
+```
+
+### private 이미지 직접 조회 차단 확인
+
+```bash
+curl -i https://cdn.newn.run/private/articles/sample.png
 ```
 
 ## 로컬 실행
@@ -65,10 +71,11 @@ docker run --rm -p 8507:8507 \
 curl -X POST "https://api.newn.run/v1/images/upload?api_key=$API_KEY" \
   -F "file=@sample.png" \
   -F "folder=articles" \
-  -F "alt=sample image"
+  -F "alt=sample image" \
+  -F "visibility=private"
 ```
 
-응답의 `image.url`은 `https://api.newn.run/v1/images/{image_id}/download` 형태이며, 기존 API 인증을 통과해야 파일을 받을 수 있습니다.
+private 응답의 `image.url`은 `https://api.newn.run/v1/images/{image_id}/download` 형태이며, 기존 API 인증을 통과해야 파일을 받을 수 있습니다. public 응답의 `image.url`과 `image.public_url`은 `https://cdn.newn.run/public/...` 형태이며 바로 공개됩니다.
 
 ## 자동 배포
 
