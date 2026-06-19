@@ -6,12 +6,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 
-SERVICE_NAME = "images-newn-run"
+SERVICE_NAME = "cdn-newn-run"
 STORAGE_DIR = Path(os.getenv("IMAGE_STORAGE_DIR", "/app/data/images"))
 
 
 app = FastAPI(
-    title="NEWN Image Storage",
+    title="NEWN CDN Storage",
     description="이미지 공유 저장소 상태만 노출하고 파일 직접 접근은 차단하는 내부 저장소 서비스",
     version="1.2.0",
 )
